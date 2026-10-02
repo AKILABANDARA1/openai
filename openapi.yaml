@@ -1,0 +1,38 @@
+openapi: 3.0.3
+
+info:
+  title: Publisher Token Proxy
+  version: "1.0"
+
+servers:
+  - url: /
+
+paths:
+  /oauth2/token:
+    post:
+      summary: OAuth2 Token Endpoint
+      operationId: oauth2Token
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - grant_type
+                - client_id
+                - client_secret
+              properties:
+                grant_type:
+                  type: string
+                client_id:
+                  type: string
+                client_secret:
+                  type: string
+      responses:
+        "200":
+          description: Token issued
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
