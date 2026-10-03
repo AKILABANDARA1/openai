@@ -2,16 +2,24 @@ openapi: 3.0.3
 
 info:
   title: Publisher Token Proxy
-  version: "1.0"
+  description: OpenAI-compatible OAuth2 token endpoint
+  version: "1.0.0"
 
 servers:
   - url: /
 
+tags:
+  - name: OAuth
+
 paths:
   /oauth2/token:
     post:
-      summary: OAuth2 Token Endpoint
-      operationId: oauth2Token
+      tags:
+        - OAuth
+      summary: Generate OAuth2 Access Token
+      description: Issues an OAuth2 access token.
+      operationId: generateAccessToken
+
       requestBody:
         required: true
         content:
@@ -25,14 +33,60 @@ paths:
               properties:
                 grant_type:
                   type: string
+                  example: client_credentials
                 client_id:
                   type: string
+                  example: my-client-id
                 client_secret:
                   type: string
+                  format: password
+                  example: my-client-secret
+                scope:
+                  type: string
+                  example: api.read
+
       responses:
         "200":
-          description: Token issued
+          description: Access token generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessTokenResponse"
+
         "400":
-          description: Bad Request
+          description: Invalid request
+
         "401":
           description: Unauthorized
+
+        "500":
+          description: Internal server error
+
+components:
+  schemas:
+    AccessTokenResponse:
+      type: object
+      required:
+        - access_token
+        - token_type
+        - expires_in
+      properties:
+        access_token:
+          type: string
+          example: eyJhbGciOi...
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+          example: 3600
+        scope:
+          type: string
+
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+
+security:
+  - BasicAuth: []
